@@ -1,4 +1,4 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, BeforeInsert } from 'typeorm';
 import { CoreEntity } from '../../common/entities/core.entity';
 import {
   InputType,
@@ -6,6 +6,8 @@ import {
   Field,
   registerEnumType,
 } from '@nestjs/graphql';
+import * as bcrypt from 'bcrypt';
+import { InternalServerErrorException } from '@nestjs/common';
 
 enum UserRole {
   Client,
@@ -30,4 +32,13 @@ export class User extends CoreEntity {
   @Column({ type: 'enum', enum: UserRole })
   @Field((type) => UserRole)
   role: UserRole;
+
+  @BeforeInsert()
+  async hashPassword(): Promise<void> {
+    try {
+      this.password = await bcrypt.hash(this.password, 10);
+    } catch (e) {
+      throw new InternalServerErrorException();
+    }
+  }
 }
