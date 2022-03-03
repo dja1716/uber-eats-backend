@@ -1,3 +1,4 @@
+import { JwtService } from './../jwt/jwt.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -11,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
-    private readonly config: ConfigService
+    private readonly jwtService: JwtService,
   ) {
     //console.log(this.config.get('SECRET_KEY'))
   }
@@ -58,7 +59,7 @@ export class UsersService {
           error: 'Wrong password',
         };
       }
-      const token = jwt.sign({id:user.id}, this.config.get('SECRET_KEY'));
+      const token = this.jwtService.sign(user.id);
       return {
         ok: true,
         token
