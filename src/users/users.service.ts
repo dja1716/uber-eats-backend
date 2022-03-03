@@ -13,7 +13,7 @@ export class UsersService {
     @InjectRepository(User) private readonly users: Repository<User>,
     private readonly config: ConfigService
   ) {
-    console.log(this.config.get('SECRET_KEY'))
+    //console.log(this.config.get('SECRET_KEY'))
   }
 
   async createAccount({
@@ -61,7 +61,7 @@ export class UsersService {
       const token = jwt.sign({id:user.id}, this.config.get('SECRET_KEY'));
       return {
         ok: true,
-        token: 'lalalal',
+        token
       };
     } catch (error) {
       return {
