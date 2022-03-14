@@ -1,3 +1,4 @@
+import { Verification } from './entities/verification.entity';
 import { EditProfileInput } from './dtos/edit-profile.dto';
 import { JwtService } from './../jwt/jwt.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(Verification) private readonly verifications: Repository<Verification>,
     private readonly jwtService: JwtService,
   ) {
     //console.log(this.config.get('SECRET_KEY'))
@@ -29,7 +31,8 @@ export class UsersService {
         //make error
         return { ok: false, error: 'There is a user with that email already' };
       }
-      await this.users.save(this.users.create({ email, password, role }));
+      const user = await this.users.save(this.users.create({ email, password, role }));
+      await this.verifications.save(this.verifications.create({user}))
       return { ok: true };
     } catch (e) {
       // make error
@@ -82,6 +85,8 @@ export class UsersService {
     const user = await this.users.findOne(userId);
     if(email) {
       user.email = email;
+      user.verified = false;
+      await this.verifications.save(this.verifications.create({user}));
     }
 
     if(password) {
