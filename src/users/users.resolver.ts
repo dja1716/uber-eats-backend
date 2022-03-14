@@ -1,3 +1,4 @@
+import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
 import { EditProfileOutput, EditProfileInput } from './dtos/edit-profile.dto';
 import { AuthGuard } from './../auth/auth.guard';
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
@@ -94,5 +95,11 @@ export class UsersResolver {
         error,
       }
     }
+  }
+
+
+  @Mutation(returns => VerifyEmailOutput)
+  verifyEmail(@Args('input') {code}: VerifyEmailInput) {
+    this.usersService.verifyEmail(code);
   }
 }
